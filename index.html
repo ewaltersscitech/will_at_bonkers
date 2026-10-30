@@ -1,0 +1,343 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,-apple-system,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Will's Hit at Bonkers</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: a single lab bench — scene canvas on top, controls + live readout beside two v–t graphs. */
+:root{
+  --bg:#f3f6f4; --panel:#ffffff; --ink:#1d2a26; --muted:#5d6e68; --line:#d5ded9;
+  --grid:#e4ebe7; --ground:#7fae7a; --sky:#e6f0f5; --net:#9aa8a3;
+  --vx:#1f6fd1; --vy:#d9541e; --v:#3b4743; --ball:#ffffff; --seam:#c8342b; --path:#8a9a94;
+  --display:"Barlow Condensed","Arial Narrow",system-ui,sans-serif;
+  --body:"Source Sans 3",system-ui,-apple-system,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#121816; --panel:#1a2220; --ink:#e3ece8; --muted:#9aaba5; --line:#2c3835;
+  --grid:#1f2927; --ground:#3f6440; --sky:#16212a; --net:#55625e;
+  --vx:#5aa2ff; --vy:#ff8a55; --v:#c9d4d0; --ball:#f4f4f0; --seam:#e0564c; --path:#6b7a75; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#121816; --panel:#1a2220; --ink:#e3ece8; --muted:#9aaba5; --line:#2c3835;
+  --grid:#1f2927; --ground:#3f6440; --sky:#16212a; --net:#55625e;
+  --vx:#5aa2ff; --vy:#ff8a55; --v:#c9d4d0; --ball:#f4f4f0; --seam:#e0564c; --path:#6b7a75; color-scheme:dark}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.5}
+.wrap{max-width:1100px;margin:0 auto;padding-block:20px 40px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;gap:16px}
+header{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:8px 20px}
+h1{font-family:var(--display);font-weight:700;font-size:clamp(28px,4.5vw,42px);line-height:1;margin:0;letter-spacing:.01em;text-wrap:balance}
+.sub{color:var(--muted);margin:4px 0 0;max-width:62ch}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:14px}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.sw{width:22px;height:4px;border-radius:2px;display:inline-block}
+.stage{background:var(--panel);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+#scene{display:block;width:100%;height:auto;touch-action:none}
+.bench{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);gap:16px}
+@media (max-width:760px){.bench{grid-template-columns:1fr}}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 16px;min-width:0}
+.card h2{font-family:var(--display);font-weight:600;font-size:15px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:0 0 10px}
+.btns{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+button{font:600 15px var(--body);padding:8px 14px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--ink);cursor:pointer}
+button.primary{background:var(--ink);color:var(--panel);border-color:var(--ink)}
+button:focus-visible,input:focus-visible{outline:3px solid var(--vx);outline-offset:2px}
+.ctl{display:grid;grid-template-columns:9.5em minmax(0,1fr) 4.6em;align-items:center;gap:8px;margin:6px 0;font-size:15px}
+.ctl output{font-family:var(--mono);font-size:13px;text-align:right;font-variant-numeric:tabular-nums}
+input[type=range]{width:100%;accent-color:var(--ink)}
+.checks{display:flex;flex-wrap:wrap;gap:6px 16px;margin-top:10px;font-size:15px}
+.checks label{display:inline-flex;gap:6px;align-items:center;cursor:pointer}
+.read{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:14px}
+.read div{border-top:2px solid var(--line);padding-top:4px}
+.read b{display:block;font-family:var(--display);font-weight:600;font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.read span{font-family:var(--mono);font-size:17px;font-variant-numeric:tabular-nums}
+.read .x{border-color:var(--vx)} .read .y{border-color:var(--vy)}
+.graphs{display:grid;gap:10px}
+.graphs canvas{display:block;width:100%;height:auto}
+.notes{font-size:15px;color:var(--ink)}
+.notes p{margin:0 0 8px;max-width:70ch}
+.notes .k{font-family:var(--mono);font-size:14px}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <div>
+      <h1>Will's Hit at Bonkers</h1>
+      <p class="sub">Will connects in the batting cage at Bonkers in Irvine. Imagine the back net is gone: follow the ball's flight and watch which velocity component changes and which one doesn't.</p>
+    </div>
+    <div class="legend" aria-label="Vector legend">
+      <span><i class="sw" style="background:var(--vx)"></i>v<sub>x</sub> horizontal</span>
+      <span><i class="sw" style="background:var(--vy)"></i>v<sub>y</sub> vertical</span>
+      <span><i class="sw" style="background:var(--v)"></i>v total</span>
+    </div>
+  </header>
+
+  <div class="stage"><canvas id="scene" aria-label="Animation of a baseball hit from a batting cage, showing horizontal and vertical velocity vectors along its path"></canvas></div>
+
+  <div class="bench">
+    <div class="card">
+      <h2>Launch</h2>
+      <div class="btns">
+        <button id="play" class="primary">Hit it</button>
+        <button id="step">Step +0.1 s</button>
+        <button id="reset">Reset</button>
+      </div>
+      <div class="ctl"><label for="v0">Exit speed</label><input id="v0" type="range" min="15" max="45" step="1" value="30"><output id="v0o"></output></div>
+      <div class="ctl"><label for="ang">Launch angle</label><input id="ang" type="range" min="5" max="75" step="1" value="35"><output id="ango"></output></div>
+      <div class="ctl"><label for="h0">Contact height</label><input id="h0" type="range" min="0" max="1.5" step="0.1" value="1"><output id="h0o"></output></div>
+      <div class="ctl"><label for="spd">Playback</label><input id="spd" type="range" min="0.1" max="1" step="0.05" value="0.5"><output id="spdo"></output></div>
+      <div class="checks">
+        <label><input id="strobe" type="checkbox" checked> Strobe snapshots</label>
+        <label><input id="total" type="checkbox" checked> Total v</label>
+        <label><input id="comp" type="checkbox" checked> Components</label>
+      </div>
+      <div class="read">
+        <div><b>Time</b><span id="rt">0.00 s</span></div>
+        <div><b>x</b><span id="rx">0.0 m</span></div>
+        <div><b>y</b><span id="ry">1.0 m</span></div>
+        <div class="x"><b>v<sub>x</sub></b><span id="rvx">–</span></div>
+        <div class="y"><b>v<sub>y</sub></b><span id="rvy">–</span></div>
+        <div><b>|v|</b><span id="rv">–</span></div>
+      </div>
+    </div>
+    <div class="card graphs">
+      <h2>Velocity vs. time</h2>
+      <canvas id="gx" aria-label="Graph of horizontal velocity against time"></canvas>
+      <canvas id="gy" aria-label="Graph of vertical velocity against time"></canvas>
+    </div>
+  </div>
+
+  <div class="card notes">
+    <h2>What to look for</h2>
+    <p><b style="color:var(--vx)">Horizontal:</b> nothing pushes the ball sideways once it leaves the bat, so <span class="k">a<sub>x</sub> = 0</span> and the blue arrow is the same length at every snapshot: <span class="k">v<sub>x</sub> = v₀ cos θ</span>.</p>
+    <p><b style="color:var(--vy)">Vertical:</b> gravity pulls down the whole time, so <span class="k">v<sub>y</sub> = v₀ sin θ − g t</span>. The orange arrow shrinks on the way up, is zero at the top, then grows pointing down. Equal time steps give equal changes in v<sub>y</sub> (9.8 m/s each second).</p>
+    <p><b>At the peak</b> the ball is still moving: v = v<sub>x</sub>, not zero. Air resistance is ignored, and g = 9.8 m/s².</p>
+  </div>
+</div>
+
+<script>
+(function(){
+const g=9.8, $=id=>document.getElementById(id);
+const scene=$('scene'), gx=$('gx'), gy=$('gy');
+const els={v0:$('v0'),ang:$('ang'),h0:$('h0'),spd:$('spd'),strobe:$('strobe'),total:$('total'),comp:$('comp')};
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+let P, t=-0.45, playing=false, last=0, swingDone=false;
+const SWING=0.45;
+function css(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim()}
+
+function params(){
+  const v0=+els.v0.value, th=+els.ang.value*Math.PI/180, h=+els.h0.value;
+  const vx=v0*Math.cos(th), vy0=v0*Math.sin(th);
+  const T=(vy0+Math.sqrt(vy0*vy0+2*g*h))/g;
+  const R=vx*T, tTop=vy0/g, H=h+vy0*vy0/(2*g);
+  // snapshots: about 8 evenly spaced steps, rounded to nice intervals
+  const cand=[0.1,0.2,0.25,0.5,1]; let dt=cand.find(c=>T/c<=10)||1;
+  P={v0,th,h,vx,vy0,T,R,tTop,H,dt};
+  $('v0o').textContent=v0+' m/s'; $('ango').textContent=els.ang.value+'°';
+  $('h0o').textContent=h.toFixed(1)+' m'; $('spdo').textContent=(+els.spd.value).toFixed(2)+'×';
+}
+const pos=t=>({x:P.vx*t,y:P.h+P.vy0*t-.5*g*t*t});
+
+// ---------- canvas sizing ----------
+let W,H,dpr,view;
+function size(){
+  dpr=Math.min(devicePixelRatio||1,2);
+  const w=scene.parentElement.clientWidth;
+  const h=Math.round(Math.max(260,Math.min(520,w*0.52)));
+  scene.width=w*dpr; scene.height=h*dpr; scene.style.height=h+'px';
+  W=w;H=h;
+  for(const c of [gx,gy]){const cw=c.parentElement.clientWidth-32; const ch=Math.round(Math.max(120,Math.min(170,cw*.36)));
+    c.width=cw*dpr;c.height=ch*dpr;c.style.height=ch+'px';c._w=cw;c._h=ch;}
+  fit();
+}
+function fit(){
+  // world box: from cage at x=-8 m to past landing; 1:1 aspect so angles are true
+  const padL=60,padR=Math.round(Math.min(130,W*0.24)),padT=50,padB=46;
+  const xmin=-9, xmax=Math.max(P.R*1.06,30), ymax=Math.max(P.H*1.25,10);
+  const s=Math.min((W-padL-padR)/(xmax-xmin),(H-padT-padB)/ymax);
+  // vector scale: v0 arrow ≈ 17% of width, but never taller than available
+  const k=Math.min(W*0.17/P.v0, (H*0.38)/P.v0);
+  view={s,ox:padL-xmin*s,oy:H-padB,xmin,xmax,ymax,k};
+}
+const X=x=>view.ox+x*view.s, Y=y=>view.oy-y*view.s;
+
+// ---------- drawing ----------
+function arrow(c,x1,y1,x2,y2,col,w,alpha){
+  const L=Math.hypot(x2-x1,y2-y1); if(L<2) return;
+  c.save();c.globalAlpha=alpha;c.strokeStyle=col;c.fillStyle=col;c.lineWidth=w;c.lineCap='round';
+  const a=Math.atan2(y2-y1,x2-x1), hl=Math.min(10+w,L*.5);
+  c.beginPath();c.moveTo(x1,y1);c.lineTo(x2-Math.cos(a)*hl*.8,y2-Math.sin(a)*hl*.8);c.stroke();
+  c.beginPath();c.moveTo(x2,y2);c.lineTo(x2-hl*Math.cos(a-.42),y2-hl*Math.sin(a-.42));c.lineTo(x2-hl*Math.cos(a+.42),y2-hl*Math.sin(a+.42));c.closePath();c.fill();
+  c.restore();
+}
+function vectors(c,tt,alpha,big){
+  const p=pos(tt), vy=P.vy0-g*tt, px=X(p.x), py=Y(p.y), k=view.k, w=big?3.5:2.2;
+  if(els.comp.checked){
+    arrow(c,px,py,px+P.vx*k,py,css('--vx'),w,alpha);
+    arrow(c,px,py,px,py-vy*k,css('--vy'),w,alpha);
+  }
+  if(els.total.checked) arrow(c,px,py,px+P.vx*k,py-vy*k,css('--v'),big?2.5:1.6,alpha*(big?1:.8));
+  if(big&&els.comp.checked){ // dashed box completing the parallelogram
+    c.save();c.globalAlpha=.35*alpha;c.strokeStyle=css('--muted');c.setLineDash([4,4]);c.lineWidth=1;
+    c.beginPath();c.moveTo(px+P.vx*k,py);c.lineTo(px+P.vx*k,py-vy*k);c.lineTo(px,py-vy*k);c.stroke();c.restore();
+  }
+}
+function ball(c,x,y,r){
+  c.save();c.fillStyle=css('--ball');c.strokeStyle=css('--muted');c.lineWidth=1;
+  c.beginPath();c.arc(x,y,r,0,7);c.fill();c.stroke();
+  c.strokeStyle=css('--seam');c.lineWidth=1.2;
+  c.beginPath();c.arc(x-r*1.3,y,r*1.05,-.6,.6);c.stroke();c.beginPath();c.arc(x+r*1.3,y,r*1.05,Math.PI-.6,Math.PI+.6);c.stroke();
+  c.restore();
+}
+function will(c,swing){
+  // Will stands left of home plate (x=-0.7 m), facing right. swing: 0 = loaded, 1 = follow-through
+  const s=view.s, fx=X(-0.75), fy=Y(0), u=Math.max(s*0.95,18); // ~1.8 m tall figure, min size
+  c.save();c.strokeStyle=css('--ink');c.fillStyle=css('--ink');c.lineWidth=Math.max(2,u*.07);c.lineCap='round';c.lineJoin='round';
+  const hip={x:fx,y:fy-u*.95}, sh={x:fx+u*.02,y:fy-u*1.5}, hd={x:fx+u*.05,y:fy-u*1.72};
+  c.beginPath();c.moveTo(fx-u*.28,fy);c.lineTo(hip.x,hip.y);c.lineTo(fx+u*.3,fy);c.stroke(); // legs
+  c.beginPath();c.moveTo(hip.x,hip.y);c.lineTo(sh.x,sh.y);c.stroke();
+  c.beginPath();c.arc(hd.x,hd.y,u*.13,0,7);c.fill();
+  // helmet brim
+  c.beginPath();c.moveTo(hd.x,hd.y-u*.05);c.lineTo(hd.x+u*.22,hd.y-u*.02);c.stroke();
+  // bat angle: from behind head (-200°) sweeping through horizontal to wrap-around
+  // swing 0..1 = load to contact (bat level at contact); swing 1..2 = follow-through
+  let a, reach;
+  if(swing<=1){const e=swing*swing; a=-2.3+2.3*e; reach=.12+.2*e;}
+  else {const e=Math.min(1,swing-1); a=-2.6*(1-Math.pow(1-e,2)); reach=.32-.15*e;}
+  const hand={x:sh.x+u*reach,y:sh.y+u*.42};
+  c.beginPath();c.moveTo(sh.x,sh.y+u*.05);c.lineTo(hand.x,hand.y);c.stroke();
+  c.save();c.strokeStyle=css('--muted');c.lineWidth=Math.max(3,u*.09);
+  const L=u*.75;c.beginPath();c.moveTo(hand.x,hand.y);c.lineTo(hand.x+L*Math.cos(a),hand.y+L*Math.sin(a));c.stroke();c.restore();
+  c.restore();
+  c.save();c.fillStyle=css('--muted');c.font='600 13px '+css('--body').split(',')[0];c.textAlign='center';
+  c.fillText('Will',fx,hd.y-u*.26);c.restore();
+}
+function cage(c){
+  // batting-cage tunnel: frame poles + netting, from x=-3 to x=1 around Will (net end opened up)
+  const x0=X(-3.2), x1=X(1.2), top=Y(3.6), gy0=Y(0);
+  c.save();c.strokeStyle=css('--net');c.lineWidth=1;c.globalAlpha=.55;
+  for(let x=x0;x<=x1;x+=7){c.beginPath();c.moveTo(x,top);c.lineTo(x,gy0);c.stroke();}
+  for(let y=top;y<=gy0;y+=7){c.beginPath();c.moveTo(x0,y);c.lineTo(x1,y);c.stroke();}
+  c.globalAlpha=1;c.lineWidth=3;c.beginPath();c.moveTo(x0,gy0);c.lineTo(x0,top);c.lineTo(x1,top);c.lineTo(x1,gy0);c.stroke();
+  c.restore();
+  // sign on a post at the far right of the field
+  const bw=Math.min(96,W*0.24-24),bh=44,br=W-14,bl=br-bw,bt=gy0-bh-34;
+  c.save();c.fillStyle=css('--muted');c.fillRect(bl+bw/2-2,bt+bh,4,gy0-bt-bh);
+  c.fillStyle=css('--panel');c.strokeStyle=css('--ink');c.lineWidth=2;
+  c.beginPath();c.roundRect?c.roundRect(bl,bt,bw,bh,5):c.rect(bl,bt,bw,bh);c.fill();c.stroke();
+  c.fillStyle=css('--ink');c.textAlign='center';
+  c.font='700 17px '+css('--display').split(',')[0];c.fillText('BONKERS',bl+bw/2,bt+20);
+  c.font='600 11px '+css('--body').split(',')[0];c.fillStyle=css('--muted');c.fillText('Irvine, CA',bl+bw/2,bt+35);
+  c.restore();
+}
+function axes(c){
+  c.save();c.font='11px '+css('--mono').split(',')[0];c.fillStyle=css('--muted');c.strokeStyle=css('--grid');c.lineWidth=1;
+  const step=[5,10,20,25,50].find(s=>view.xmax/s<=10)||50;
+  for(let x=0;x<=view.xmax;x+=step){c.beginPath();c.moveTo(X(x),Y(0));c.lineTo(X(x),Y(view.ymax));c.stroke();c.textAlign='center';c.fillText(x+' m',X(x),Y(0)+16);}
+  const ys=[2,5,10,20].find(s=>view.ymax/s<=6)||20;
+  for(let y=ys;y<=view.ymax;y+=ys){c.beginPath();c.moveTo(X(-9),Y(y));c.lineTo(X(view.xmax),Y(y));c.stroke();c.textAlign='right';c.fillText(y+' m',X(-9)-4,Y(y)+4);}
+  c.restore();
+}
+function draw(){
+  const c=scene.getContext('2d');c.setTransform(dpr,0,0,dpr,0,0);
+  c.fillStyle=css('--sky');c.fillRect(0,0,W,H);
+  axes(c);
+  c.fillStyle=css('--ground');c.fillRect(0,Y(0),W,H-Y(0));
+  cage(c);
+  // home plate
+  c.fillStyle=css('--ball');c.fillRect(X(0)-6,Y(0)-2,12,3);
+  const tt=Math.max(0,Math.min(t,P.T)), live=t>=0;
+  // full predicted path, faint
+  c.save();c.setLineDash([3,5]);c.strokeStyle=css('--path');c.lineWidth=1.2;c.globalAlpha=.6;c.beginPath();
+  for(let i=0;i<=80;i++){const p=pos(P.T*i/80);i?c.lineTo(X(p.x),Y(p.y)):c.moveTo(X(p.x),Y(p.y));}c.stroke();c.restore();
+  if(live){
+    // traced path
+    c.save();c.strokeStyle=css('--ink');c.lineWidth=2;c.beginPath();
+    for(let i=0;i<=60;i++){const p=pos(tt*i/60);i?c.lineTo(X(p.x),Y(p.y)):c.moveTo(X(p.x),Y(p.y));}c.stroke();c.restore();
+    // strobe snapshots
+    if(els.strobe.checked){
+      for(let i=0;i*P.dt<=tt+1e-9;i++){ const s=i*P.dt; if(tt-s<P.dt*0.25&&tt<P.T) continue;
+        vectors(c,s,.45,false); const p=pos(s); ball(c,X(p.x),Y(p.y),3.5);
+        c.save();c.fillStyle=css('--muted');c.font='10px '+css('--mono').split(',')[0];c.textAlign='center';
+        c.fillText((+s.toFixed(2))+' s',X(p.x),Y(p.y)+16);c.restore();}
+    }
+    // apex marker
+    if(tt>=P.tTop&&P.tTop>0){const p=pos(P.tTop);c.save();c.fillStyle=css('--vy');c.font='600 12px '+css('--body').split(',')[0];c.textAlign='center';
+      c.fillText('peak: v_y = 0',X(p.x),Y(p.y)-14-(els.comp.checked?0:0));c.restore();}
+    vectors(c,tt,1,true);
+    const p=pos(tt); ball(c,X(p.x),Y(p.y),6);
+    if(t>=P.T){c.save();c.fillStyle=css('--ink');c.font='600 13px '+css('--body').split(',')[0];c.textAlign='center';
+      c.fillText('lands at '+P.R.toFixed(1)+' m after '+P.T.toFixed(2)+' s',X(P.R),Y(0)-22);c.restore();}
+  } else {
+    ball(c,X(0.15),Y(P.h),6);
+  }
+  will(c, live?1+Math.min(1,t/0.3):Math.max(0,Math.min(1,(t+SWING)/SWING)));
+  readout(tt,live);
+  graph(gx,'vx'); graph(gy,'vy');
+}
+function readout(tt,live){
+  const p=pos(tt), vy=P.vy0-g*tt;
+  $('rt').textContent=(live?tt:0).toFixed(2)+' s';
+  $('rx').textContent=(live?p.x:0).toFixed(1)+' m';
+  $('ry').textContent=(live?p.y:P.h).toFixed(1)+' m';
+  $('rvx').textContent=live?P.vx.toFixed(1)+' m/s':'–';
+  $('rvy').textContent=live?(vy>=0?'+':'−')+Math.abs(vy).toFixed(1)+' m/s':'–';
+  $('rv').textContent=live?Math.hypot(P.vx,vy).toFixed(1)+' m/s':'–';
+}
+function graph(cv,which){
+  const c=cv.getContext('2d'),w=cv._w,h=cv._h;c.setTransform(dpr,0,0,dpr,0,0);
+  c.clearRect(0,0,w,h);
+  const L=52,R=12,T=18,B=24, vmax=Math.ceil(P.v0/5)*5;
+  const isX=which==='vx', col=css(isX?'--vx':'--vy');
+  const lo=isX?0:-Math.ceil((g*P.T-P.vy0)/5)*5-5, hi=isX?vmax:Math.ceil(P.vy0/5)*5+5;
+  const gxp=t=>L+(w-L-R)*t/P.T, gyp=v=>T+(h-T-B)*(hi-v)/(hi-lo);
+  c.font='11px '+css('--mono').split(',')[0];c.fillStyle=css('--muted');c.strokeStyle=css('--grid');c.lineWidth=1;
+  const st=(hi-lo)>40?10:5;
+  for(let v=Math.ceil(lo/st)*st;v<=hi;v+=st){c.beginPath();c.moveTo(L,gyp(v));c.lineTo(w-R,gyp(v));c.stroke();c.textAlign='right';c.fillText(v,L-6,gyp(v)+4);}
+  c.strokeStyle=css('--muted');c.beginPath();c.moveTo(L,gyp(0));c.lineTo(w-R,gyp(0));c.stroke();
+  c.textAlign='center';c.fillText('0',L,h-6);c.fillText(P.T.toFixed(2)+' s',w-R-14,h-6);
+  if(!isX&&P.tTop>0){c.fillText(P.tTop.toFixed(2)+' s',gxp(P.tTop),h-6);
+    c.save();c.setLineDash([3,3]);c.beginPath();c.moveTo(gxp(P.tTop),T);c.lineTo(gxp(P.tTop),h-B);c.stroke();c.restore();}
+  c.fillStyle=col;c.textAlign='left';c.font='600 12px '+css('--body').split(',')[0];
+  c.fillText(isX?'vₓ (m/s)  — constant':'v_y (m/s)  — slope = −9.8 m/s²',L,12);
+  const f=tt=>isX?P.vx:P.vy0-g*tt;
+  c.save();c.strokeStyle=col;c.globalAlpha=.25;c.lineWidth=2;c.beginPath();c.moveTo(gxp(0),gyp(f(0)));c.lineTo(gxp(P.T),gyp(f(P.T)));c.stroke();c.restore();
+  if(t>=0){const tt=Math.min(t,P.T);
+    c.strokeStyle=col;c.lineWidth=2.5;c.beginPath();c.moveTo(gxp(0),gyp(f(0)));c.lineTo(gxp(tt),gyp(f(tt)));c.stroke();
+    c.fillStyle=col;c.beginPath();c.arc(gxp(tt),gyp(f(tt)),4,0,7);c.fill();}
+}
+function frame(now){
+  if(!playing) return;
+  const dt=Math.min(.05,(now-last)/1000); last=now;
+  t+=dt*(t<0?1:+els.spd.value);
+  if(t>=P.T){t=P.T;playing=false;$('play').textContent='Replay';}
+  draw(); if(playing) requestAnimationFrame(frame);
+}
+function play(){
+  if(t>=P.T) t=-SWING;
+  if(reduce&&t<0) t=0;
+  playing=!playing; $('play').textContent=playing?'Pause':'Resume';
+  if(playing){last=performance.now();requestAnimationFrame(frame);}
+}
+$('play').onclick=play;
+$('step').onclick=()=>{playing=false;$('play').textContent='Resume';t=Math.min(P.T,Math.max(0,t)+0.1);if(t>=P.T)$('play').textContent='Replay';draw();};
+$('reset').onclick=()=>{playing=false;t=-SWING;$('play').textContent='Hit it';draw();};
+for(const k of ['v0','ang','h0']) els[k].addEventListener('input',()=>{params();fit();playing=false;t=-SWING;$('play').textContent='Hit it';draw();});
+els.spd.addEventListener('input',()=>{params();});
+for(const k of ['strobe','total','comp']) els[k].addEventListener('change',draw);
+addEventListener('resize',()=>{size();draw();});
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change',draw);
+new MutationObserver(draw).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
+params();size();
+// open on a mid-flight still so the first frame teaches something
+t=P.tTop*1.55; draw(); $('play').textContent='Replay';
+if(document.fonts) document.fonts.ready.then(draw);
+})();
+</script>
+
+</body>
+</html>
